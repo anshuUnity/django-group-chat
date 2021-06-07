@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Chat Room{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+      <h1>CHAT ROOM FOR EVERYONE</h1>
+      <p>Enter Your Username and chatroom</p>
+      <p>And You Are Good to go</p>
+    </div>
+</div>
+
+<form class="container" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="exampleInputEmail1">Username</label>
+      <input type="text" name='username' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Username">
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Room Code</label>
+      <input type="text" name='code' class="form-control" id="exampleInputPassword1" placeholder="Room Code">
+    </div>
+    <button type="submit" class="btn btn-primary">Create Room</button>
+</form>
+
+{% endblock %}

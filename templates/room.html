@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Chat Room{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+      <h1>CHAT ROOM FOR EVERYONE</h1>
+      <h3>Room Name {{room_name}}</h3>
+      <p>And You Are Good to go</p>
+    </div>
+</div>
+
+<div class="conatiner">
+    <div id="chat-messages" class="container" style="max-height: 200px; overflow-y: scroll;">{% for m in messages %}<b>{{ m.username }}</b>: {{ m.content }}<br>{% endfor %}</div>
+</div>
+
+<div class="field container">
+    <div class="control">
+        <input class="input form-control" type="text" placeholder="Message" id="chat-message-input">
+    </div>
+</div>
+
+<div class="field container mt-3">
+    <div class="control">
+        <a class="btn btn-success" id="chat-message-submit">Submit</a>
+    </div>
+</div>
+<div class="container">
+    <span>your username: <b>{{username}}</b></span>
+</div>
+
+{{room_name|json_script:"json-roomname"}}
+{{username|json_script:"json-username"}}
+
+<script>
+    const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
+    const username = JSON.parse(document.getElementById('json-username').textContent);
+
+    const socket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + roomName
+        + '/'
+    );
+
+    socket.onopen = function(e){
+        console.log("Connection Established");
+    }
+
+    socket.onmessage = function(e){
+        console.log(e);
+
+        const data = JSON.parse(e.data);
+
+        if(data.message){
+            document.querySelector('#chat-messages').innerHTML += ('<b>' + data.username + '</b>: ' + data.message + '<br>');
+        }else{
+            alert('No Message');
+        }
+    }
+
+    socket.onclose = function(e){
+        console.log('Connection Closed');
+    }
+
+    document.querySelector('#chat-message-submit').onclick = function(e){
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        socket.send(JSON.stringify({
+            'message':message,
+            'username':username,
+            'room':roomName
+        }));
+
+        messageInputDom.value = '';
+
+    };
+</script>
+
+{% endblock %}
